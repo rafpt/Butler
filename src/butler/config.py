@@ -57,7 +57,7 @@ class Settings:
     source_max_bytes: int = 2 * 1024 * 1024
     content_retention_days: int = 30
     report_retention_days: int = 365
-    telegram_bot_username: str = "Aspasia_4U_Bot"
+    telegram_bot_username: str = "butleradelaidebot"
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
     telegram_timeout_seconds: float = 10.0
@@ -109,7 +109,7 @@ class Settings:
             content_retention_days=int(os.getenv("BUTLER_CONTENT_RETENTION_DAYS", "30")),
             report_retention_days=int(os.getenv("BUTLER_REPORT_RETENTION_DAYS", "365")),
             telegram_bot_username=os.getenv(
-                "BUTLER_TELEGRAM_BOT_USERNAME", "Aspasia_4U_Bot"
+                "BUTLER_TELEGRAM_BOT_USERNAME", "butleradelaidebot"
             ).removeprefix("@"),
             telegram_bot_token=os.getenv("BUTLER_TELEGRAM_BOT_TOKEN")
             or _keychain_value("bot-token"),

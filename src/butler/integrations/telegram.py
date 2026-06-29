@@ -29,7 +29,7 @@ class TelegramNotifier:
         *,
         bot_token: str,
         chat_id: str,
-        bot_username: str = "Aspasia_4U_Bot",
+        bot_username: str = "butleradelaidebot",
         timeout_seconds: float = 10.0,
         transport: TelegramTransport | None = None,
     ) -> None:

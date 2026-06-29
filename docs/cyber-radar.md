@@ -25,12 +25,9 @@ Use `scripts/uninstall_launch_agent.sh` to remove the schedule without deleting 
 
 ## Telegram alerts
 
-The configured bot is the existing
-[`@Aspasia_4U_Bot`](https://t.me/Aspasia_4U_Bot), whose source lives at
-`/Users/raf/Code/aspasia_bot` and
-[`rafpt/aspasia-bot`](https://github.com/rafpt/aspasia-bot). Butler intentionally does not
-import or run the Aspasia application: it shares only the Telegram bot identity through the
-official Bot API, keeping both runtimes independently deployable.
+The configured bot is the dedicated
+[`@butleradelaidebot`](https://t.me/butleradelaidebot). It is used only for Butler alerts
+through the official Telegram Bot API.
 
 Open the bot and send `/start`, then run:
 
@@ -45,10 +42,6 @@ the service `com.butler.telegram`. Environment variables
 `BUTLER_TELEGRAM_BOT_TOKEN` and `BUTLER_TELEGRAM_CHAT_ID` remain available for ephemeral
 development only. Neither secret is written to Git, SQLite, logs, reports, or the LaunchAgent
 plist.
-
-If a bot token has ever appeared in Git history, revoke and regenerate it with BotFather before
-running the setup. Removing the text from the current branch does not invalidate an exposed
-credential.
 
 Telegram failures are isolated from macOS notifications and never prevent report publication.
 Normal reports receive a ready notification. Reports containing `Must` items include stronger

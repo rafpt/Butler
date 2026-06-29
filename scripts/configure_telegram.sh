@@ -4,9 +4,8 @@ set -euo pipefail
 SERVICE="com.butler.telegram"
 ROOT="${0:A:h:h}"
 
-echo "Existing Telegram bot: @Aspasia_4U_Bot"
-echo "Source: /Users/raf/Code/aspasia_bot"
-echo "Use only the current token obtained from BotFather; never reuse a token found in Git history."
+echo "Telegram alert bot: @butleradelaidebot"
+echo "Use only the current token obtained from BotFather."
 echo
 echo "The macOS Keychain will securely prompt for the BotFather token."
 /usr/bin/security add-generic-password \
@@ -23,7 +22,7 @@ if /usr/bin/security find-generic-password \
   echo "Existing Butler chat ID found in macOS Keychain; reusing it."
 else
   echo
-  echo "Send /start to @Aspasia_4U_Bot now, then press Enter."
+  echo "Send /start to @butleradelaidebot now, then press Enter."
   read -r
   echo "Chats visible to the bot:"
   cd "$ROOT"
