@@ -13,7 +13,7 @@ def _default_data_dir() -> Path:
     return Path.home() / "Library" / "Application Support" / "Butler"
 
 
-def _keychain_value(account: str) -> str:
+def _keychain_value(service: str, account: str) -> str:
     if platform.system() != "Darwin":
         return ""
     try:
@@ -22,7 +22,7 @@ def _keychain_value(account: str) -> str:
                 "/usr/bin/security",
                 "find-generic-password",
                 "-s",
-                "com.butler.telegram",
+                service,
                 "-a",
                 account,
                 "-w",
@@ -112,7 +112,8 @@ class Settings:
                 "BUTLER_TELEGRAM_BOT_USERNAME", "butleradelaidebot"
             ).removeprefix("@"),
             telegram_bot_token=os.getenv("BUTLER_TELEGRAM_BOT_TOKEN")
-            or _keychain_value("bot-token"),
-            telegram_chat_id=os.getenv("BUTLER_TELEGRAM_CHAT_ID") or _keychain_value("chat-id"),
+            or _keychain_value("com.butler.telegram", "bot-token"),
+            telegram_chat_id=os.getenv("BUTLER_TELEGRAM_CHAT_ID")
+            or _keychain_value("com.butler.telegram", "chat-id"),
             telegram_timeout_seconds=float(os.getenv("BUTLER_TELEGRAM_TIMEOUT_SECONDS", "10")),
         )

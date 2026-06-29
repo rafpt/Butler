@@ -8,7 +8,7 @@
 - Reports: `~/Library/Application Support/Butler/reports/radar`.
 - Logs: `~/Library/Logs/Butler/cyber-radar.*.log`.
 - Model: local OMLX at `http://127.0.0.1:8000/v1`.
-- Notifications: macOS locally and Telegram when configured.
+- Notifications: macOS and `@butleradelaidebot` when configured.
 
 ## Operator commands
 
@@ -25,11 +25,8 @@ Use `scripts/uninstall_launch_agent.sh` to remove the schedule without deleting 
 
 ## Telegram alerts
 
-The configured bot is the dedicated
-[`@butleradelaidebot`](https://t.me/butleradelaidebot). It is used only for Butler alerts
-through the official Telegram Bot API.
-
-Open the bot and send `/start`, then run:
+The dedicated bot is
+[`@butleradelaidebot`](https://t.me/butleradelaidebot). Open it, send `/start`, then run:
 
 ```bash
 ./scripts/configure_telegram.sh
@@ -44,8 +41,7 @@ development only. Neither secret is written to Git, SQLite, logs, reports, or th
 plist.
 
 Telegram failures are isolated from macOS notifications and never prevent report publication.
-Normal reports receive a ready notification. Reports containing `Must` items include stronger
-wording and up to three primary-source links.
+Reports containing `Must` items include stronger wording and up to three primary-source links.
 
 ## Failure behavior
 

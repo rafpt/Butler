@@ -4,7 +4,7 @@ install:
 	uv sync --extra dev
 
 test:
-	PYTHONPATH=src python3 -m unittest discover -s tests -v
+	uv run python -m unittest discover -s tests -v
 
 lint:
 	uv run ruff check .
@@ -13,7 +13,7 @@ lint:
 check: test lint
 
 run:
-	PYTHONPATH=src python3 -m butler health
+	uv run butler health
 
 radar:
 	uv run butler radar run

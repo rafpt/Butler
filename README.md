@@ -49,18 +49,16 @@ PYTHONPATH=src python3 -m butler feedback item_... follow
 # Install the daily 07:30 launch agent
 ./scripts/install_launch_agent.sh
 
-# Configure Telegram securely in macOS Keychain and send a test
+# Configure @butleradelaidebot securely in Keychain
 ./scripts/configure_telegram.sh
 ```
 
 Reports are stored under
 `~/Library/Application Support/Butler/reports/radar` unless `BUTLER_DATA_DIR` is overridden.
 The scheduled job always uses OMLX and never reads cloud credentials.
-Telegram delivery uses the dedicated
-[`@butleradelaidebot`](https://t.me/butleradelaidebot) and is enabled automatically when
-`bot-token` and `chat-id` exist under the
-`com.butler.telegram` service in macOS Keychain. The BotFather token is never committed or
-written to the LaunchAgent plist.
+Telegram delivery uses [`@butleradelaidebot`](https://t.me/butleradelaidebot) and is enabled
+automatically when `bot-token` and `chat-id` exist under the `com.butler.telegram` service in
+macOS Keychain. The BotFather token is never committed or written to the LaunchAgent plist.
 
 ## Architecture
 
