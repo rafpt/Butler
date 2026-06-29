@@ -1,4 +1,4 @@
-.PHONY: test lint check install run radar install-agent uninstall-agent
+.PHONY: test lint check install run radar install-agent uninstall-agent telegram-configure
 
 install:
 	uv sync --extra dev
@@ -23,3 +23,6 @@ install-agent:
 
 uninstall-agent:
 	./scripts/uninstall_launch_agent.sh
+
+telegram-configure:
+	./scripts/configure_telegram.sh

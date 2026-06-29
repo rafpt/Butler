@@ -10,6 +10,7 @@ the package, runtime, and Git history.
 - SQLite task repository with an append-only event trail
 - Daily Cyber Radar with authoritative sources and deterministic ranking
 - Local OMLX synthesis with manual-only cloud deep dives
+- macOS and optional Telegram alerts through `@Aspasia_4U_Bot`
 - CLI for health checks and task management
 - JSON logs suitable for local collection and automation
 - Small tool, skill, and integration contracts instead of agent-specific coupling
@@ -47,11 +48,17 @@ PYTHONPATH=src python3 -m butler feedback item_... follow
 
 # Install the daily 07:30 launch agent
 ./scripts/install_launch_agent.sh
+
+# Configure Telegram securely in macOS Keychain and send a test
+./scripts/configure_telegram.sh
 ```
 
 Reports are stored under
 `~/Library/Application Support/Butler/reports/radar` unless `BUTLER_DATA_DIR` is overridden.
 The scheduled job always uses OMLX and never reads cloud credentials.
+Telegram delivery is enabled automatically when `bot-token` and `chat-id` exist under the
+`com.butler.telegram` service in macOS Keychain. The BotFather token is never committed or
+written to the LaunchAgent plist.
 
 ## Architecture
 

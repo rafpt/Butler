@@ -8,6 +8,7 @@
 - Reports: `~/Library/Application Support/Butler/reports/radar`.
 - Logs: `~/Library/Logs/Butler/cyber-radar.*.log`.
 - Model: local OMLX at `http://127.0.0.1:8000/v1`.
+- Notifications: macOS locally and Telegram when configured.
 
 ## Operator commands
 
@@ -22,11 +23,33 @@ launchctl print gui/$UID/com.butler.cyber-radar
 Use `scripts/install_launch_agent.sh` after changing the plist template or Python environment.
 Use `scripts/uninstall_launch_agent.sh` to remove the schedule without deleting reports.
 
+## Telegram alerts
+
+The configured bot is [`@Aspasia_4U_Bot`](https://t.me/Aspasia_4U_Bot). Open it and send
+`/start`, obtain the numeric chat ID, then run:
+
+```bash
+./scripts/configure_telegram.sh
+uv run butler notify telegram-chats
+uv run butler notify telegram-test
+```
+
+The script stores `bot-token` and `chat-id` as generic-password entries in macOS Keychain under
+the service `com.butler.telegram`. Environment variables
+`BUTLER_TELEGRAM_BOT_TOKEN` and `BUTLER_TELEGRAM_CHAT_ID` remain available for ephemeral
+development only. Neither secret is written to Git, SQLite, logs, reports, or the LaunchAgent
+plist.
+
+Telegram failures are isolated from macOS notifications and never prevent report publication.
+Normal reports receive a ready notification. Reports containing `Must` items include stronger
+wording and up to three primary-source links.
+
 ## Failure behavior
 
 - One source failure marks the report degraded but does not stop publication.
 - OMLX failure replaces the synthesis with a deterministic notice.
 - A process lock prevents overlapping runs.
+- Notification-channel failures are logged but never stop report publication.
 - Scheduled runs never inspect cloud-provider settings.
 - HTTP sources are HTTPS-only, host-allowlisted, bounded to 2 MiB, and retried with backoff and
   jitter.

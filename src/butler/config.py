@@ -3,12 +3,38 @@
 from __future__ import annotations
 
 import os
+import platform
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 
 def _default_data_dir() -> Path:
     return Path.home() / "Library" / "Application Support" / "Butler"
+
+
+def _keychain_value(account: str) -> str:
+    if platform.system() != "Darwin":
+        return ""
+    try:
+        result = subprocess.run(
+            [
+                "/usr/bin/security",
+                "find-generic-password",
+                "-s",
+                "com.butler.telegram",
+                "-a",
+                account,
+                "-w",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=3,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +57,10 @@ class Settings:
     source_max_bytes: int = 2 * 1024 * 1024
     content_retention_days: int = 30
     report_retention_days: int = 365
+    telegram_bot_username: str = "Aspasia_4U_Bot"
+    telegram_bot_token: str = ""
+    telegram_chat_id: str = ""
+    telegram_timeout_seconds: float = 10.0
 
     @property
     def database_path(self) -> Path:
@@ -43,6 +73,10 @@ class Settings:
     @property
     def logs_dir(self) -> Path:
         return self.data_dir / "logs"
+
+    @property
+    def telegram_configured(self) -> bool:
+        return bool(self.telegram_bot_token and self.telegram_chat_id)
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -74,4 +108,11 @@ class Settings:
             source_max_bytes=int(os.getenv("BUTLER_SOURCE_MAX_BYTES", str(2 * 1024 * 1024))),
             content_retention_days=int(os.getenv("BUTLER_CONTENT_RETENTION_DAYS", "30")),
             report_retention_days=int(os.getenv("BUTLER_REPORT_RETENTION_DAYS", "365")),
+            telegram_bot_username=os.getenv(
+                "BUTLER_TELEGRAM_BOT_USERNAME", "Aspasia_4U_Bot"
+            ).removeprefix("@"),
+            telegram_bot_token=os.getenv("BUTLER_TELEGRAM_BOT_TOKEN")
+            or _keychain_value("bot-token"),
+            telegram_chat_id=os.getenv("BUTLER_TELEGRAM_CHAT_ID") or _keychain_value("chat-id"),
+            telegram_timeout_seconds=float(os.getenv("BUTLER_TELEGRAM_TIMEOUT_SECONDS", "10")),
         )

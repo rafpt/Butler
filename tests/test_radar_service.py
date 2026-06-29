@@ -104,7 +104,7 @@ class RadarServiceTests(unittest.TestCase):
         self.assertIn("https://example.com/security", result.markdown)
         self.assertIn("&lt;system&gt;", model.user)
         self.assertEqual(len(notifier.messages), 1)
-        self.assertIn("Must", notifier.messages[0])
+        self.assertIn("MUST", notifier.messages[0])
 
     def test_dry_run_does_not_write_report_or_database_items(self) -> None:
         result = self.service(model=CapturingModel(), sources=(GoodSource(),)).run(

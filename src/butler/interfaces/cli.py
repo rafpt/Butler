@@ -19,7 +19,9 @@ from butler.config import Settings
 from butler.core.research import FeedbackAction
 from butler.integrations.llm import ModelError, OpenAICompatibleClient
 from butler.integrations.macos import MacNotifier
+from butler.integrations.notifications import CompositeNotifier
 from butler.integrations.sources import default_sources
+from butler.integrations.telegram import TelegramNotifier, discover_telegram_chats
 from butler.memory import ResearchRepository, SqliteStore
 from butler.observability import configure_logging
 from butler.policies.autonomy import AutonomyPolicy
@@ -101,7 +103,32 @@ def _parser() -> argparse.ArgumentParser:
     research.add_argument("item_id")
     research.add_argument("--deep-dive", action="store_true", required=True)
     research.add_argument("--cloud", action="store_true")
+
+    notify = subcommands.add_parser("notify", help="Test configured notification channels")
+    notify_commands = notify.add_subparsers(dest="notify_command", required=True)
+    notify_commands.add_parser(
+        "telegram-test",
+        help="Send a test alert to the configured Telegram chat",
+    )
+    notify_commands.add_parser(
+        "telegram-chats",
+        help="List chats that have sent a message to the configured bot",
+    )
     return parser
+
+
+def _telegram_notifier(settings: Settings) -> TelegramNotifier:
+    if not settings.telegram_configured:
+        raise ValueError(
+            "Telegram não configurado; guarde bot-token e chat-id no Keychain "
+            "com scripts/configure_telegram.sh"
+        )
+    return TelegramNotifier(
+        bot_token=settings.telegram_bot_token,
+        chat_id=settings.telegram_chat_id,
+        bot_username=settings.telegram_bot_username,
+        timeout_seconds=settings.telegram_timeout_seconds,
+    )
 
 
 def _radar_service(settings: Settings, store: SqliteStore, *, with_sources: bool) -> RadarService:
@@ -116,7 +143,10 @@ def _radar_service(settings: Settings, store: SqliteStore, *, with_sources: bool
         sources=default_sources(settings) if with_sources else (),
         local_model=local_model,
         policy=AutonomyPolicy(settings.autonomy_level),
-        notifier=MacNotifier(),
+        notifier=CompositeNotifier(
+            MacNotifier(),
+            *([_telegram_notifier(settings)] if settings.telegram_configured else []),
+        ),
     )
 
 
@@ -244,6 +274,59 @@ def _handle_research(args: argparse.Namespace, settings: Settings, store: Sqlite
     return 0
 
 
+def _handle_notify(args: argparse.Namespace, settings: Settings) -> int:
+    if args.notify_command == "telegram-test":
+        delivered = _telegram_notifier(settings).notify(
+            title="Butler Cyber Radar",
+            message=(
+                "✅ Teste concluído. Os alertas diários e os avisos MUST serão "
+                f"enviados por @{settings.telegram_bot_username}."
+            ),
+        )
+        if not delivered:
+            raise RuntimeError("O Telegram recusou ou não recebeu o alerta de teste")
+        print(
+            json.dumps(
+                {
+                    "status": "sent",
+                    "channel": "telegram",
+                    "bot": f"@{settings.telegram_bot_username}",
+                }
+            )
+        )
+        return 0
+    if args.notify_command == "telegram-chats":
+        if not settings.telegram_bot_token:
+            raise ValueError(
+                "Telegram não configurado; guarde bot-token no Keychain "
+                "com scripts/configure_telegram.sh"
+            )
+        chats = discover_telegram_chats(
+            bot_token=settings.telegram_bot_token,
+            timeout_seconds=settings.telegram_timeout_seconds,
+        )
+        print(
+            json.dumps(
+                {
+                    "bot": f"@{settings.telegram_bot_username}",
+                    "chats": [
+                        {
+                            "id": chat.id,
+                            "type": chat.kind,
+                            "name": chat.name,
+                            "username": chat.username,
+                        }
+                        for chat in chats
+                    ],
+                    "count": len(chats),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
+    return 2
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
@@ -277,6 +360,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_feedback(args, settings, store)
         if args.command == "research":
             return _handle_research(args, settings, store)
+        if args.command == "notify":
+            return _handle_notify(args, settings)
     except (ValueError, LookupError, PermissionError, RuntimeError, ModelError, OSError) as error:
         print(json.dumps({"status": "error", "error": str(error)}), file=sys.stderr)
         return 1
