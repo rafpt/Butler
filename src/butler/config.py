@@ -13,6 +13,10 @@ def _default_data_dir() -> Path:
     return Path.home() / "Library" / "Application Support" / "Butler"
 
 
+def _default_scanner_outbox() -> Path:
+    return Path.home() / "Library" / "Application Support" / "Data Breach Scanner" / "outbox"
+
+
 def _keychain_value(service: str, account: str) -> str:
     if platform.system() != "Darwin":
         return ""
@@ -61,6 +65,7 @@ class Settings:
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
     telegram_timeout_seconds: float = 10.0
+    scanner_outbox_root: Path = _default_scanner_outbox()
 
     @property
     def database_path(self) -> Path:
@@ -116,4 +121,7 @@ class Settings:
             telegram_chat_id=os.getenv("BUTLER_TELEGRAM_CHAT_ID")
             or _keychain_value("com.butler.telegram", "chat-id"),
             telegram_timeout_seconds=float(os.getenv("BUTLER_TELEGRAM_TIMEOUT_SECONDS", "10")),
+            scanner_outbox_root=Path(
+                os.getenv("BUTLER_SCANNER_OUTBOX_ROOT", str(_default_scanner_outbox()))
+            ).expanduser(),
         )

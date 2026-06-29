@@ -17,6 +17,7 @@ from typing import Self
 from butler import __version__
 from butler.config import Settings
 from butler.core.research import FeedbackAction
+from butler.integrations.breach_outbox import PrivateBreachConsumer
 from butler.integrations.llm import ModelError, OpenAICompatibleClient
 from butler.integrations.macos import MacNotifier
 from butler.integrations.notifications import CompositeNotifier
@@ -114,6 +115,15 @@ def _parser() -> argparse.ArgumentParser:
         "telegram-chats",
         help="List chats that have sent a message to the configured bot",
     )
+
+    breach = subcommands.add_parser(
+        "breach",
+        help="Consume private Data Breach Scanner events",
+    )
+    breach_commands = breach.add_subparsers(dest="breach_command", required=True)
+    breach_consume = breach_commands.add_parser("consume")
+    breach_consume.add_argument("--dry-run", action="store_true")
+    breach_consume.add_argument("--limit", type=int, default=20)
     return parser
 
 
@@ -327,6 +337,28 @@ def _handle_notify(args: argparse.Namespace, settings: Settings) -> int:
     return 2
 
 
+def _handle_breach(args: argparse.Namespace, settings: Settings) -> int:
+    if args.breach_command != "consume":
+        return 2
+    consumer = PrivateBreachConsumer(
+        outbox_root=settings.scanner_outbox_root,
+        notifier=None if args.dry_run else _telegram_notifier(settings),
+    )
+    result = consumer.consume(dry_run=args.dry_run, limit=args.limit)
+    print(
+        json.dumps(
+            {
+                "status": "ok" if not result.failed and not result.invalid else "partial",
+                "delivered": result.delivered,
+                "failed": result.failed,
+                "invalid": result.invalid,
+                "pending": result.pending,
+            }
+        )
+    )
+    return 0 if not result.failed and not result.invalid else 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
@@ -362,6 +394,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_research(args, settings, store)
         if args.command == "notify":
             return _handle_notify(args, settings)
+        if args.command == "breach":
+            return _handle_breach(args, settings)
     except (ValueError, LookupError, PermissionError, RuntimeError, ModelError, OSError) as error:
         print(json.dumps({"status": "error", "error": str(error)}), file=sys.stderr)
         return 1

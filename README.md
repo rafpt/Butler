@@ -11,6 +11,7 @@ the package, runtime, and Git history.
 - Daily Cyber Radar with authoritative sources and deterministic ranking
 - Local OMLX synthesis with manual-only cloud deep dives
 - macOS and optional Telegram alerts through `@butleradelaidebot`
+- Private exposure alerts and remediation from Data Breach Scanner
 - CLI for health checks and task management
 - JSON logs suitable for local collection and automation
 - Small tool, skill, and integration contracts instead of agent-specific coupling
@@ -59,6 +60,21 @@ The scheduled job always uses OMLX and never reads cloud credentials.
 Telegram delivery uses [`@butleradelaidebot`](https://t.me/butleradelaidebot) and is enabled
 automatically when `bot-token` and `chat-id` exist under the `com.butler.telegram` service in
 macOS Keychain. The BotFather token is never committed or written to the LaunchAgent plist.
+
+## Private breach alerts
+
+Butler consumes only the scanner's `private` outbox and delivers actionable notices through
+`@butleradelaidebot`. It cannot publish to HiveSec or the BASH sites.
+
+```bash
+# Validate pending events without sending or moving them
+uv run butler breach consume --dry-run
+
+# Install the private consumer (every five minutes)
+./scripts/install_breach_consumer.sh
+```
+
+An event moves to `processed/private` only after Telegram confirms delivery.
 
 ## Architecture
 
