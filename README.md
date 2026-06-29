@@ -4,6 +4,9 @@ Butler is a local-first personal chief of staff for macOS. The active codebase i
 repository. `archive/Candy` is legacy migration input only and is intentionally excluded from
 the package, runtime, and Git history.
 
+The canonical goal, boundaries and implementation history are in
+[PROJECT.md](PROJECT.md).
+
 ## Current foundation
 
 - Explicit autonomy policy with confirmation boundaries
