@@ -56,7 +56,9 @@ PYTHONPATH=src python3 -m butler feedback item_... follow
 Reports are stored under
 `~/Library/Application Support/Butler/reports/radar` unless `BUTLER_DATA_DIR` is overridden.
 The scheduled job always uses OMLX and never reads cloud credentials.
-Telegram delivery is enabled automatically when `bot-token` and `chat-id` exist under the
+Telegram delivery uses the existing
+[`@Aspasia_4U_Bot`](https://t.me/Aspasia_4U_Bot) and is enabled automatically when `bot-token`
+and `chat-id` exist under the
 `com.butler.telegram` service in macOS Keychain. The BotFather token is never committed or
 written to the LaunchAgent plist.
 
