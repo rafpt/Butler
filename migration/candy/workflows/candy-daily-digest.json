@@ -1,0 +1,153 @@
+[
+  {
+    "updatedAt": "2026-06-08T16:57:10.210Z",
+    "createdAt": "2026-06-08T10:48:04.987Z",
+    "id": "vX2hrSd7Fu2AUXGb",
+    "name": "Candy v3 — Daily Digest (/v1/digest/daily → email)",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "30 8 * * *"
+              }
+            ]
+          }
+        },
+        "id": "trigger-0830",
+        "name": "Todos os dias 08:30",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          240,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8000/v1/digest/daily",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ top_k: 30, since_hours: 24, max_tokens: 600 }) }}",
+          "options": {}
+        },
+        "id": "http-daily",
+        "name": "POST /v1/digest/daily",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          460,
+          300
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "candyApiKey0001",
+            "name": "Candy API Key"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "raf@bash.pt",
+          "subject": "=Candy — Digest diário {{ $now.format('yyyy-LL-dd') }}",
+          "message": "={{ $json.digest }}",
+          "options": {}
+        },
+        "id": "send-email",
+        "name": "Enviar email (Gmail)",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          680,
+          300
+        ],
+        "notes": "Requer credencial Gmail OAuth2 configurada no n8n. Alternativa: nó SMTP."
+      }
+    ],
+    "connections": {
+      "Todos os dias 08:30": {
+        "main": [
+          [
+            {
+              "node": "POST /v1/digest/daily",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "POST /v1/digest/daily": {
+        "main": [
+          [
+            {
+              "node": "Enviar email (Gmail)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    },
+    "staticData": {
+      "node:Todos os dias 08:30": {
+        "recurrenceRules": []
+      }
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "e584d1af-53fa-4703-b6b1-8838e81333d0",
+    "activeVersionId": "e584d1af-53fa-4703-b6b1-8838e81333d0",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-08T10:48:04.987Z",
+        "createdAt": "2026-06-08T10:48:04.987Z",
+        "role": "workflow:owner",
+        "workflowId": "vX2hrSd7Fu2AUXGb",
+        "projectId": "CkiTirUinWJ3FGpp",
+        "project": {
+          "updatedAt": "2026-06-06T01:46:10.480Z",
+          "createdAt": "2026-06-05T21:55:18.976Z",
+          "id": "CkiTirUinWJ3FGpp",
+          "name": "Rui Ferreira <raf@bash.pt>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "446a9b07-cc93-4ffd-b817-cffbf0395208"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

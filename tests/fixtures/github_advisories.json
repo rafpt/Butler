@@ -1,0 +1,30 @@
+[
+  {
+    "ghsa_id": "GHSA-aaaa-bbbb-cccc",
+    "cve_id": "CVE-2026-5555",
+    "url": "https://api.github.com/advisories/GHSA-aaaa-bbbb-cccc",
+    "html_url": "https://github.com/advisories/GHSA-aaaa-bbbb-cccc",
+    "summary": "Critical Python package advisory",
+    "description": "A package permits remote code execution.",
+    "severity": "critical",
+    "published_at": "2026-06-29T05:00:00Z",
+    "identifiers": [
+      {
+        "value": "GHSA-aaaa-bbbb-cccc",
+        "type": "GHSA"
+      },
+      {
+        "value": "CVE-2026-5555",
+        "type": "CVE"
+      }
+    ],
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "pip",
+          "name": "example-package"
+        }
+      }
+    ]
+  }
+]

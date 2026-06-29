@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Security Feed</title>
+    <item>
+      <title>Docker security engineering update</title>
+      <link>https://www.docker.com/blog/security-update/?utm_source=test</link>
+      <description><![CDATA[<p>New hardening guidance for container deployments.</p>]]></description>
+      <pubDate>Mon, 29 Jun 2026 04:30:00 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

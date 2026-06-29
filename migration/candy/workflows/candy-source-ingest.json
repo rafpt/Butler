@@ -1,0 +1,165 @@
+[
+  {
+    "updatedAt": "2026-06-08T10:52:58.301Z",
+    "createdAt": "2026-06-08T10:48:04.987Z",
+    "id": "aSzT1ouBAU5egXOg",
+    "name": "Candy v3 — Source Ingest (RSS → /v1/ingest)",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 6
+              }
+            ]
+          }
+        },
+        "id": "trigger-schedule",
+        "name": "A cada 6h",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          240,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://hnrss.org/newest?q=security",
+          "options": {}
+        },
+        "id": "rss-read",
+        "name": "Ler feed RSS",
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.1,
+        "position": [
+          460,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "jsValue": "// Mapeia os items do RSS para o formato do /v1/ingest\nconst items = $input.all().map((it, i) => {\n  const j = it.json;\n  return {\n    id: j.guid || j.link || String(i),\n    title: j.title || '',\n    url: j.link || '',\n    published_at: j.isoDate || j.pubDate || '',\n    summary: j.contentSnippet || ''\n  };\n});\nreturn [{ json: { source_id: 'hn-security', items } }];"
+        },
+        "id": "map-items",
+        "name": "Mapear p/ ingest",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          680,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8000/v1/ingest",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json) }}",
+          "options": {}
+        },
+        "id": "http-ingest",
+        "name": "POST /v1/ingest",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          900,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "A cada 6h": {
+        "main": [
+          [
+            {
+              "node": "Ler feed RSS",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ler feed RSS": {
+        "main": [
+          [
+            {
+              "node": "Mapear p/ ingest",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mapear p/ ingest": {
+        "main": [
+          [
+            {
+              "node": "POST /v1/ingest",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": {
+      "node:A cada 6h": {
+        "recurrenceRules": [
+          12
+        ]
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "48fae1f1-5fe5-42f3-bf44-76966561fcee",
+    "activeVersionId": "48fae1f1-5fe5-42f3-bf44-76966561fcee",
+    "versionCounter": 1,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-08T10:48:04.987Z",
+        "createdAt": "2026-06-08T10:48:04.987Z",
+        "role": "workflow:owner",
+        "workflowId": "aSzT1ouBAU5egXOg",
+        "projectId": "CkiTirUinWJ3FGpp",
+        "project": {
+          "updatedAt": "2026-06-06T01:46:10.480Z",
+          "createdAt": "2026-06-05T21:55:18.976Z",
+          "id": "CkiTirUinWJ3FGpp",
+          "name": "Rui Ferreira <raf@bash.pt>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "446a9b07-cc93-4ffd-b817-cffbf0395208"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

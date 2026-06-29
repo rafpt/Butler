@@ -1,0 +1,142 @@
+[
+  {
+    "updatedAt": "2026-06-08T11:27:51.030Z",
+    "createdAt": "2026-06-08T10:48:04.987Z",
+    "id": "ZFerzOwR4Pg4Bnmd",
+    "name": "Candy v3 — Feedback Loop (webhook → /v1/feedback/signal)",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "candy-feedback",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "webhook-fb",
+        "name": "Webhook (decisão)",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ],
+        "webhookId": "candy-feedback",
+        "notes": "Recebe {signal_id, action}. action ∈ confirm|reject|snooze. Ligar a botões no email do digest."
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://host.docker.internal:8000/v1/feedback/signal",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ signal_id: $json.body.signal_id, action: $json.body.action }) }}",
+          "options": {}
+        },
+        "id": "http-fb",
+        "name": "POST /v1/feedback/signal",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          460,
+          300
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "candyApiKey0001",
+            "name": "Candy API Key"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify($json) }}",
+          "options": {}
+        },
+        "id": "respond",
+        "name": "Responder",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          680,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook (decisão)": {
+        "main": [
+          [
+            {
+              "node": "POST /v1/feedback/signal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "POST /v1/feedback/signal": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": null,
+    "versionId": "d0c71055-4f39-4720-8da1-97ef56b8dfe4",
+    "activeVersionId": "d0c71055-4f39-4720-8da1-97ef56b8dfe4",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-06-08T10:48:04.987Z",
+        "createdAt": "2026-06-08T10:48:04.987Z",
+        "role": "workflow:owner",
+        "workflowId": "ZFerzOwR4Pg4Bnmd",
+        "projectId": "CkiTirUinWJ3FGpp",
+        "project": {
+          "updatedAt": "2026-06-06T01:46:10.480Z",
+          "createdAt": "2026-06-05T21:55:18.976Z",
+          "id": "CkiTirUinWJ3FGpp",
+          "name": "Rui Ferreira <raf@bash.pt>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "446a9b07-cc93-4ffd-b817-cffbf0395208"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

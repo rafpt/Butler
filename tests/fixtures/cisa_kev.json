@@ -1,0 +1,16 @@
+{
+  "title": "CISA Known Exploited Vulnerabilities Catalog",
+  "vulnerabilities": [
+    {
+      "cveID": "CVE-2026-1234",
+      "vendorProject": "Example Vendor",
+      "product": "Gateway",
+      "vulnerabilityName": "Example Gateway Remote Code Execution",
+      "dateAdded": "2026-06-29",
+      "shortDescription": "An unauthenticated attacker can execute code.",
+      "requiredAction": "Apply the vendor update.",
+      "dueDate": "2026-07-01",
+      "knownRansomwareCampaignUse": "Known"
+    }
+  ]
+}

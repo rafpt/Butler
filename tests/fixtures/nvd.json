@@ -1,0 +1,35 @@
+{
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2026-4321",
+        "published": "2026-06-29T06:00:00.000Z",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "A vulnerability affects a widely used container component."
+          }
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {
+              "cvssData": {
+                "baseScore": 9.8
+              }
+            }
+          ]
+        },
+        "weaknesses": [
+          {
+            "description": [
+              {
+                "lang": "en",
+                "value": "CWE-78"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

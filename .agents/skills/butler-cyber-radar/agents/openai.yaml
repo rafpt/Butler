@@ -1,0 +1,4 @@
+interface:
+  display_name: "Butler Cyber Radar"
+  short_description: "Generate and investigate the daily cyber radar"
+  default_prompt: "Use $butler-cyber-radar to review today’s cyber radar and explain the Must items."
